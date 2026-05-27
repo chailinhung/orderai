@@ -41,7 +41,7 @@
                 console.error('LIFF Error:', e);
                 // 發生錯誤時，嘗試帶著原有參數回 GAS，名字標記為未知
                 const urlParams = new URLSearchParams(window.location.search);
-                urlParams.set('uName', 'Guest');
+                urlParams.set('uName', '');
                 urlParams.set('action', 'order');
                 window.location.replace(GAS_WEB_APP_URL + '?' + urlParams.toString());
             }
