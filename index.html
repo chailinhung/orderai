@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正在驗證身份...</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f4f7f9; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #06C755; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="loader"></div>
+    <script>
+        // 【重要】請在此處填入您的資訊
+        const LIFF_ID = '2010215773-Z1Z86z5x'; 
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby7hWVeoB0l8BJM0WpqrudARsYIz-Jok1CYnZ5XhkwP94tLUaMs5eXklZMD8nIn34IK/exec';
+
+        async function init() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
+                    const profile = await liff.getProfile();
+                    
+                    // 取得原始網址中的所有參數
+                    const urlParams = new URLSearchParams(window.location.search);
+                    
+                    // 加入名字參數
+                    urlParams.set('uName', profile.displayName);
+                    urlParams.set('action', 'order'); // 確保 action 是 order
+                    
+                    // 組合成最終導向 GAS 的網址
+                    const finalUrl = GAS_WEB_APP_URL + '?' + urlParams.toString();
+                    window.location.replace(finalUrl);
+                }
+            } catch (e) {
+                console.error('LIFF Error:', e);
+                // 發生錯誤時，嘗試帶著原有參數回 GAS，名字標記為未知
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('uName', 'Guest');
+                urlParams.set('action', 'order');
+                window.location.replace(GAS_WEB_APP_URL + '?' + urlParams.toString());
+            }
+        }
+        window.onload = init;
+    </script>
+</body>
+</html>
