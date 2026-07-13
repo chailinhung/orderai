@@ -46,7 +46,6 @@
                         userName = profile.displayName;
                     }
                     return { userName: userName || "" };
-
                 } catch (e) {
                     console.error('LIFF Error:', e);
                     return { userName: "" };
@@ -61,19 +60,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const finalName = result.userName || "";
             urlParams.set('uName', finalName);
-            const targetUrl = GAS_WEB_APP_URL + '?' + urlParams.toString();
-
-            if (liff.isInClient()) {
-                liff.openWindow({
-                    url: targetUrl,
-                    external: true
-                });
-                setTimeout(() => {
-                    liff.closeWindow();
-                }, 300);
-            } else {
-                window.location.replace(targetUrl);
-            }
+            
+            window.location.replace(GAS_WEB_APP_URL + '?' + urlParams.toString());
         }
         window.onload = init;
     </script>
