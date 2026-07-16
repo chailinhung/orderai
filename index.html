@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>菜單載入中...</title>
+    <title>取得訂購人名字...</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
         body { font-family: -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f4f7f9; }
@@ -14,19 +14,19 @@
 <body>
     <div class="loader"></div>
     <script>
+        // 🔔 請確保此處為您 LIFF_ID
         const LIFF_ID = '2010215773-Z1Z86z5x'; 
+        
+        // 🔔 請確保此處為您後端 GAS Web App 的部署網址
         const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby7hWVeoB0l8BJM0WpqrudARsYIz-Jok1CYnZ5XhkwP94tLUaMs5eXklZMD8nIn34IK/exec';
 
-        async function init() {
-            // 設定 5 秒強制跳轉定時器 (Timeout)
-            const timeoutPromise = new Promise((resolve) => {
-                setTimeout(() => {
-                    console.log('LIFF Timeout: Redirecting with default name...');
-                    resolve({ isTimeout: true });
-                }, 5000);
-            });
+        // 🔔 請將此處改為您 GitHub Pages 的專案根目錄網址（尾端不加斜線）
+        const GITHUB_PAGES_BASE = 'https://chailinhung.github.io/orderai';
 
-            // LIFF 處理邏輯
+        async function init() {
+            // 設置 5 秒超時防止 LIFF 載入卡死
+            const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({ userName: "" }), 5000));
+
             const liffPromise = (async () => {
                 try {
                     await liff.init({ liffId: LIFF_ID });
@@ -46,6 +46,7 @@
                         userName = profile.displayName;
                     }
                     return { userName: userName || "" };
+
                 } catch (e) {
                     console.error('LIFF Error:', e);
                     return { userName: "" };
@@ -60,8 +61,20 @@
             const urlParams = new URLSearchParams(window.location.search);
             const finalName = result.userName || "";
             urlParams.set('uName', finalName);
-            
-            window.location.replace(GAS_WEB_APP_URL + '?' + urlParams.toString());
+
+            // 🎯 【關鍵分流邏輯】
+            const orderType = urlParams.get('type') || "";
+
+            if (orderType === 'SUBWAY') {
+                // 1. 如果是 subway_order，直接導回 GAS 執行原本的後端渲染
+                window.location.replace(GAS_WEB_APP_URL + '?' + urlParams.toString());
+            } else if (orderType === 'DRINK') {
+                // 2. 如果是飲料，導向 GitHub 的 order_drink_ui.html
+                window.location.replace(GITHUB_PAGES_BASE + '/order_drink_ui.html?' + urlParams.toString());
+            } else {
+                // 3. 其他狀況（一般餐點），導向 GitHub 的 order_ui.html
+                window.location.replace(GITHUB_PAGES_BASE + '/order_ui.html?' + urlParams.toString());
+            }
         }
         window.onload = init;
     </script>
